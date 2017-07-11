@@ -395,24 +395,24 @@ get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
 			/* not To DS and not From DS */
 			*srcp = ADDR2;
 			*dstp = ADDR1;
-         *bssid = ADDR3;
+ 			*bssid = ADDR3;
 		} else {
 			/* not To DS and From DS */
 			*srcp = ADDR3;
 			*dstp = ADDR1;
-         *bssid = ADDR2;
+			*bssid = ADDR2;
 		}
 	} else {
 		if (!FC_FROM_DS(fc)) {
 			/* From DS and not To DS */
 			*srcp = ADDR2;
 			*dstp = ADDR3;
-         *bssid = ADDR1;
+			*bssid = ADDR1;
 		} else {
 			/* To DS and From DS */
 			*srcp = ADDR4;
 			*dstp = ADDR3;
-         *bssid = NULL;
+			*bssid = NULL;
 		}
 	}
 
@@ -602,7 +602,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 		printf("src-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", src[0], src[1],src[2],src[3],src[4],src[5]);
 		printf("dst-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
 		if (bssid != NULL)
-			printf("bssid  :%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
+			printf("bssid  :%02x:%02x:%02x:%02x:%02x:%02x\n\n\n", bssid[0], bssid[1],bssid[2],bssid[3],bssid[4],bssid[5]);
 		break;
 	default:
 		/* We shouldn't get here - we should already have quit */
