@@ -389,7 +389,7 @@ wep_print(const u_char *p)
  */
 static void
 get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
-                     const uint8_t **dstp)
+                     const uint8_t **dstp, const uint8_t **bssid)
 {
 #define ADDR1  (p + 4)
 #define ADDR2  (p + 10)
@@ -401,20 +401,24 @@ get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
 			/* not To DS and not From DS */
 			*srcp = ADDR2;
 			*dstp = ADDR1;
+         *bssid = ADDR3;
 		} else {
 			/* not To DS and From DS */
 			*srcp = ADDR3;
 			*dstp = ADDR1;
+         *bssid = ADDR2;
 		}
 	} else {
 		if (!FC_FROM_DS(fc)) {
 			/* From DS and not To DS */
 			*srcp = ADDR2;
 			*dstp = ADDR3;
+         *bssid = ADDR1;
 		} else {
 			/* To DS and From DS */
 			*srcp = ADDR4;
 			*dstp = ADDR3;
+         *bssid = NULL;
 		}
 	}
 
@@ -545,7 +549,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 {
 	uint16_t fc;
 	u_int caplen, hdrlen, meshdrlen;
-	const uint8_t *src, *dst;
+	const uint8_t *src, *dst, *bssid;
 	int llc_hdrlen;
 
 	caplen = orig_caplen;
@@ -605,7 +609,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 				return hdrlen;
 			}
 		} else {
-			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst);
+			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst, &bssid);
+         printf("src-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", src[0], src[1],src[2],src[3],src[4],src[5]);
+         printf("dst-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
+         if (bssid != NULL)
+           printf("bssid  :%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
 #if 0
 			llc_hdrlen = llc_print(p, length, caplen, &src, &dst);
 			if (llc_hdrlen < 0) {
