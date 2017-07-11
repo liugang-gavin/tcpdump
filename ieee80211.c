@@ -368,12 +368,6 @@ struct meshcntl_t {
 #define	IV_PAD(iv)	(((iv) >> 24) & 0x3F)
 #define	IV_KEYID(iv)	(((iv) >> 30) & 0x03)
 
-static int
-wep_print(const u_char *p)
-{
-	return 1;
-}
-
 /*
  *  Data Frame - Address field contents
  *
@@ -604,28 +598,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 		if (DATA_FRAME_IS_NULL(FC_SUBTYPE(fc)))
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
-		if (FC_PROTECTED(fc)) {
-			if (!wep_print(p)) {
-				return hdrlen;
-			}
-		} else {
-			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst, &bssid);
-         printf("src-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", src[0], src[1],src[2],src[3],src[4],src[5]);
-         printf("dst-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
-         if (bssid != NULL)
-           printf("bssid  :%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
-#if 0
-			llc_hdrlen = llc_print(p, length, caplen, &src, &dst);
-			if (llc_hdrlen < 0) {
-				/*
-				 * Some kinds of LLC packet we cannot
-				 * handle intelligently
-				 */
-				llc_hdrlen = -llc_hdrlen;
-			}
-#endif
-			hdrlen += llc_hdrlen;
-		}
+		get_data_src_dst_mac(fc, p - hdrlen, &src, &dst, &bssid);
+		printf("src-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", src[0], src[1],src[2],src[3],src[4],src[5]);
+		printf("dst-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
+		if (bssid != NULL)
+			printf("bssid  :%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
 		break;
 	default:
 		/* We shouldn't get here - we should already have quit */
@@ -645,7 +622,7 @@ void
 ieee802_11_if_print(u_char *arg, const struct pcap_pkthdr *h, const u_char *p)
 {
 	ieee802_11_print(p, h->len, h->caplen, 0, 0);
-   return;
+	return;
 }
 
 
@@ -1475,7 +1452,7 @@ void
 ieee802_11_radio_if_print(u_char *arg, const struct pcap_pkthdr *h, const u_char *p)
 {
 	ieee802_11_radio_print(p, h->len, h->caplen);
-   return;
+	return;
 }
 
 /*
@@ -1487,5 +1464,5 @@ void
 ieee802_11_radio_avs_if_print(u_char *arg, const struct pcap_pkthdr *h, const u_char *p)
 {
 	ieee802_11_avs_radio_print(p, h->len, h->caplen);
-   return;
+	return;
 }
