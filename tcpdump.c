@@ -12,8 +12,8 @@ int main()
   int  dlt;
 
   /* get a device */
-  devStr = pcap_lookupdev(errBuf);
-  //devStr = "wlx488ad239e728";
+  //devStr = pcap_lookupdev(errBuf);
+  devStr = "wlan0";
 
   if(devStr) {
     printf("success: device: %s\n", devStr);
