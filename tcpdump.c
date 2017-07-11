@@ -5,20 +5,10 @@
 
 #include "ieee80211.h"
 
-void getPacket(u_char * arg,
-               const struct pcap_pkthdr * pkthdr,
-               const u_char * packet)
-{
-  int * id = (int *)arg;
-
-//  ieee802_11_if_print(pkthdr, packet);
- 
-  printf("\n\n");
-}
- 
 int main()  
 {  
   char errBuf[PCAP_ERRBUF_SIZE], * devStr;
+  pcap_handler callback;
   int  dlt;
 
   /* get a device */
@@ -40,21 +30,22 @@ int main()
     exit(1);
   }
 
-  /* wait a packet to arrive */
-/*
-  struct pcap_pkthdr packet;
-  const u_char * pktStr = pcap_next(device, &packet);
-
-  if(!pktStr) {  
-    printf("did not capture a packet!\n");
-    exit(1);
-  }
- 
-  printf("Packet length: %d\n", packet.len);
-  printf("Number of bytes: %d\n", packet.caplen);
-  printf("Recieved time: %s\n", ctime((const time_t *)&packet.ts.tv_sec));
-*/
   dlt = pcap_datalink(device);
+
+  switch (dlt) {
+  case DLT_IEEE802_11_RADIO:
+    callback = ieee802_11_radio_if_print;
+    break;
+  case DLT_IEEE802_11_RADIO_AVS:
+    callback = ieee802_11_radio_avs_if_print;
+    break;
+  case DLT_IEEE802_11:
+    callback = ieee802_11_if_print;
+    break;
+  default:
+    printf("error: '%s' is not a 80211 interface.\n", devStr);
+    goto out;
+  }
 
   printf("%x,\n", dlt);
   /* construct a filter */
@@ -64,7 +55,9 @@ int main()
 
   /* wait loop forever */
   int id = 0;
-  pcap_loop(device, -1, getPacket, (u_char*)&id);
+  pcap_loop(device, -1, callback, (u_char*)&id);
+
+out:
   pcap_close(device);
   return 0;
 }

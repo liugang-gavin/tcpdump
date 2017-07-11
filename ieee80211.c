@@ -633,10 +633,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
-ieee802_11_if_print(const struct pcap_pkthdr *h, const u_char *p)
+void
+ieee802_11_if_print(u_char *arg, const struct pcap_pkthdr *h, const u_char *p)
 {
-	return ieee802_11_print(p, h->len, h->caplen, 0, 0);
+	ieee802_11_print(p, h->len, h->caplen, 0, 0);
+   return;
 }
 
 
@@ -1462,10 +1463,11 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
  * For DLT_IEEE802_11_RADIO; like DLT_IEEE802_11, but with an extra
  * header, containing information such as radio information.
  */
-u_int
-ieee802_11_radio_if_print(const struct pcap_pkthdr *h, const u_char *p)
+void
+ieee802_11_radio_if_print(u_char *arg, const struct pcap_pkthdr *h, const u_char *p)
 {
-	return ieee802_11_radio_print(p, h->len, h->caplen);
+	ieee802_11_radio_print(p, h->len, h->caplen);
+   return;
 }
 
 /*
@@ -1473,8 +1475,9 @@ ieee802_11_radio_if_print(const struct pcap_pkthdr *h, const u_char *p)
  * extra header, containing information such as radio information,
  * which we currently ignore.
  */
-u_int
-ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *h, const u_char *p)
+void
+ieee802_11_radio_avs_if_print(u_char *arg, const struct pcap_pkthdr *h, const u_char *p)
 {
-	return ieee802_11_avs_radio_print(p, h->len, h->caplen);
+	ieee802_11_avs_radio_print(p, h->len, h->caplen);
+   return;
 }
