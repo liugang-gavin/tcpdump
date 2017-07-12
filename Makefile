@@ -1,6 +1,6 @@
 CC=gcc
 
-CSRC = tcpdump.c ieee80211.c cpack.c
+CSRC = tcpdump.c ieee80211.c cpack.c decoder.c
 
 OBJ = $(CSRC:.c=.o)
 

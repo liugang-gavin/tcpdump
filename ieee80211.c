@@ -401,6 +401,7 @@ get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
 			*srcp = ADDR3;
 			*dstp = ADDR1;
 			*bssid = ADDR2;
+			decoder_process_package(*srcp,*dstp,*bssid);
 		}
 	} else {
 		if (!FC_FROM_DS(fc)) {
@@ -599,10 +600,6 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
 		get_data_src_dst_mac(fc, p - hdrlen, &src, &dst, &bssid);
-		printf("src-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", src[0], src[1],src[2],src[3],src[4],src[5]);
-		printf("dst-mac:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
-		if (bssid != NULL)
-			printf("bssid  :%02x:%02x:%02x:%02x:%02x:%02x\n\n\n", bssid[0], bssid[1],bssid[2],bssid[3],bssid[4],bssid[5]);
 		break;
 	default:
 		/* We shouldn't get here - we should already have quit */
