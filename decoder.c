@@ -23,7 +23,7 @@ struct decoder_t{
 	uint8_t  src_mac[6];
 	uint8_t  bssid[6];
    uint8_t  datalen;
-	uint8_t  currlen;
+	uint8_t  curlen;
    int8_t  *passwd;
 	void	(*callback)(int8_t  *passwd);
 };
@@ -73,13 +73,16 @@ decoder_process_package(const uint8_t *src,
 								const uint8_t *dst,
 								const uint8_t *bssid)
 {
+	printf("dst:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
 	if (decoder_is_prefix(dst)) {
-			if (memcmp(decoder.src_mac, src, 6) == 0)
+			if (memcmp(decoder.src_mac, src, 6) == 0) {
 				decoder.prefix_num ++;
-			else {
+				printf("prefix_num %d.....................\n", decoder.prefix_num);
+			} else {
 				memcpy(decoder.src_mac, src, 6);
 				memcpy(decoder.bssid, bssid, 6);
 				decoder.prefix_num = 1;
+				printf("prefix_num %d.....................\n", decoder.prefix_num);
 			}
 			return 0;
 	}
@@ -96,8 +99,10 @@ decoder_process_package(const uint8_t *src,
 					decoder.passwd[dst[4]] == 0) {
 				decoder.passwd[dst[4]] = dst[5];
 				printf("get pass word %d,%c", dst[4], dst[5]);
+				decoder.curlen ++;
 			}
 	}
+	return 0;
 }
 
 uint32_t

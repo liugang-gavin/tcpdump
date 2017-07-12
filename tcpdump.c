@@ -11,6 +11,8 @@ int main()
   pcap_handler callback;
   int  dlt;
 
+  decoder_init();
+
   /* get a device */
   //devStr = pcap_lookupdev(errBuf);
   devStr = "wlan0";
