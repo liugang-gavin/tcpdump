@@ -73,16 +73,13 @@ decoder_process_package(const uint8_t *src,
 								const uint8_t *dst,
 								const uint8_t *bssid)
 {
-	printf("dst:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
 	if (decoder_is_prefix(dst)) {
 			if (memcmp(decoder.src_mac, src, 6) == 0) {
 				decoder.prefix_num ++;
-				printf("prefix_num %d.....................\n", decoder.prefix_num);
 			} else {
 				memcpy(decoder.src_mac, src, 6);
 				memcpy(decoder.bssid, bssid, 6);
 				decoder.prefix_num = 1;
-				printf("prefix_num %d.....................\n", decoder.prefix_num);
 			}
 			return 0;
 	}
@@ -94,6 +91,8 @@ decoder_process_package(const uint8_t *src,
 				decoder.passwd = malloc(decoder.datalen + 1);
 				memset(decoder.passwd, 0, decoder.datalen + 1);
 			}
+	printf("dst:%02x:%02x:%02x:%02x:%02x:%02x\n", dst[0], dst[1],dst[2],dst[3],dst[4],dst[5]);
+	printf("%d,%d.%d..\n", decoder.passwd[dst[4]], decoder_is_data(dst), decoder.datalen);
 			
 			if (decoder_is_data(dst) && dst[4] < decoder.datalen &&
 					decoder.passwd[dst[4]] == 0) {
