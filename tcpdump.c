@@ -63,18 +63,28 @@ out:
 int main(int argc, char **argv)
 {   
 	pthread_t tid;
+	int channel;
+	char cmd[128];
 
-	decoder_open();
+	for (channel = 1; channel <= 13; channel ++){
+		sprintf(cmd, "iw dev wlan0 set channel %d", channel);
+		if (!system(cmd)){
+			printf("ERROR: set wlan0 to channel %d error.\n", channel);
+		}
+		
+		decoder_open();
 
-	if (!pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
-		printf("pthread create error.\n");
-	}
+		if (!pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
+			printf("ERROR: pthread create error.\n");
+			goto out;
+		}
 	
-	sleep(10);
-	pcap_breakloop(device);
-	printf("pcap_breakloop called!\n");
-	pthread_join(tid, NULL);
-	decoder_close();
- 
+		usleep(10000);
+		pcap_breakloop(device);
+
+		pthread_join(tid, NULL);
+		decoder_close();
+	}
+out:
 	return 0;
 }
