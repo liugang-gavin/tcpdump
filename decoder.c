@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "decoder.h"
+
 
 
 #define DECODER_PREFIX_NUMBER 10
@@ -25,23 +27,11 @@ struct decoder_t{
    uint8_t  datalen;
 	uint8_t  curlen;
    int8_t  *passwd;
-	void	(*callback)(int8_t  *passwd);
+	decoder_callback_t callback;
+	void	  *callback_arg;
 };
 
 static struct decoder_t decoder; 
-
-static inline uint32_t
-decoder_is_prefix(const uint8_t *dst)
-{
-	if (dst[0] == DECODER_MULTICAST_MAC0 &&
-       dst[1] == DECODER_MULTICAST_MAC1 &&
-		 dst[2] == DECODER_MULTICAST_MAC2 &&
-		 dst[3] == DECODER_PREFIX_MAC3 &&
-		 dst[4] == DECODER_PREFIX_MAC4 &&
-		 dst[5] == DECODER_PREFIX_MAC5)
-		return 1;
-	return 0;
-}
 
 #define IS_PREFIX_MAC(mac) (mac[0] == DECODER_MULTICAST_MAC0 && \
 									mac[1] == DECODER_MULTICAST_MAC1 && \
@@ -50,34 +40,12 @@ decoder_is_prefix(const uint8_t *dst)
 									mac[4] == DECODER_PREFIX_MAC4 && \
 									mac[5] == DECODER_PREFIX_MAC5)
 
-static inline uint32_t
-decoder_is_length(const uint8_t *dst)
-{
-   if (dst[0] == DECODER_MULTICAST_MAC0 &&
-       dst[1] == DECODER_MULTICAST_MAC1 &&
-       dst[2] == DECODER_MULTICAST_MAC2 &&
-       dst[3] == DECODER_DATA_MAC3 &&
-       dst[4] == DECODER_LENGTH_MAC4)
-      return 1;
-   return 0;
-}
 #define IS_LENGTH_MAC(mac) (mac[0] == DECODER_MULTICAST_MAC0 && \
 									mac[1] == DECODER_MULTICAST_MAC1 && \
 									mac[2] == DECODER_MULTICAST_MAC2 && \
 									mac[3] == DECODER_DATA_MAC3 && \
 									mac[4] == DECODER_LENGTH_MAC4)
 
-static inline uint32_t
-decoder_is_data(const uint8_t *dst)
-{
-   if (dst[0] == DECODER_MULTICAST_MAC0 &&
-       dst[1] == DECODER_MULTICAST_MAC1 &&
-       dst[2] == DECODER_MULTICAST_MAC2 &&
-       dst[3] == DECODER_DATA_MAC3 &&
-       dst[4] != DECODER_LENGTH_MAC4)
-      return 1;
-   return 0;
-}
 #define IS_DATA_MAC(mac) (mac[0] == DECODER_MULTICAST_MAC0 && \
 									mac[1] == DECODER_MULTICAST_MAC1 && \
 									mac[2] == DECODER_MULTICAST_MAC2 && \
@@ -112,19 +80,23 @@ decoder_process_package(const uint8_t *src,
 			if (IS_DATA_MAC(dst) && dst[4] < decoder.datalen &&
 					decoder.passwd[dst[4]] == 0) {
 				decoder.passwd[dst[4]] = dst[5];
-				printf("get pass word %d,%c", dst[4], dst[5]);
 				decoder.curlen ++;
+				if (decoder.curlen == decoder.datalen)
+					decoder.callback(decoder.passwd, decoder.bssid,
+										 decoder.callback_arg);
 			}
 	}
 	return 0;
 }
 
 uint32_t
-decoder_open()
+decoder_open(decoder_callback_t callback, void *arg)
 {
 	decoder.prefix_num = 0;
 	decoder.datalen = 0;
 	decoder.passwd = NULL;
+	decoder.callback = callback;
+	decoder.callback_arg = arg;
 	return 0;
 }
 
@@ -136,6 +108,7 @@ decoder_close()
    if (decoder.passwd != NULL)
 		free(decoder.passwd);
 	decoder.passwd = NULL;
+	decoder.callback = NULL;
    return 0;
 }
 

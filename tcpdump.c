@@ -59,33 +59,47 @@ out:
   return 0;
 }
 
+int decoder_finished(int8_t *passwd, int8_t *bssid, void *arg)
+{
+	printf("Get SSID: %02x:%02x:%02x:%02x:%02x:%02x.\nPassword:%s\n",
+			 bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5],
+			 passwd);
+	*(int*)arg = 1;
+}
+
 
 int main(int argc, char **argv)
 {   
 	pthread_t tid;
 	int channel;
 	char cmd[128];
+	int finished = 0;
 
+	decoder_open(decoder_finished, &finished);
+	if (pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
+		printf("ERROR: pthread create error.\n");
+		goto out;
+	}
+
+retry:
 	for (channel = 1; channel <= 13; channel ++){
 		sprintf(cmd, "iw dev wlan0 set channel %d", channel);
 		if (system(cmd)){
 			printf("ERROR: set wlan0 to channel %d error.\n", channel);
 			goto out;
 		}
-		
-		decoder_open();
-
-		if (pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
-			printf("ERROR: pthread create error.\n");
-			goto out;
-		}
-	
-		usleep(10000);
-		pcap_breakloop(device);
-
-		pthread_join(tid, NULL);
-		decoder_close();
+		usleep(100000);
 	}
+
+	if (!finished) {
+		printf("WARN: retry");
+		goto retry;
+	}
+	
+	pcap_breakloop(device);
+
+	pthread_join(tid, NULL);
+	decoder_close();
 out:
 	return 0;
 }
