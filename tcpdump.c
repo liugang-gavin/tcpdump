@@ -68,13 +68,14 @@ int main(int argc, char **argv)
 
 	for (channel = 1; channel <= 13; channel ++){
 		sprintf(cmd, "iw dev wlan0 set channel %d", channel);
-		if (!system(cmd)){
+		if (system(cmd)){
 			printf("ERROR: set wlan0 to channel %d error.\n", channel);
+			goto out;
 		}
 		
 		decoder_open();
 
-		if (!pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
+		if (pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
 			printf("ERROR: pthread create error.\n");
 			goto out;
 		}
