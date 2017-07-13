@@ -92,7 +92,7 @@ retry:
 	}
 
 	if (!finished) {
-		printf("WARN: retry");
+		printf("WARN: retry\n");
 		goto retry;
 	}
 	
