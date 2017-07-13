@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-typedef int (*decoder_callback_t)(int8_t *passwd, int8_t *bssid, void *arg);
+typedef int (*decoder_callback_t)(int8_t *passwd, uint8_t *bssid, void *arg);
 uint32_t
 decoder_open(decoder_callback_t callback, void *arg);
 

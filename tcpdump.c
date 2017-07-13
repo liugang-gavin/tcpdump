@@ -59,7 +59,7 @@ out:
   return 0;
 }
 
-int decoder_finished(int8_t *passwd, int8_t *bssid, void *arg)
+int decoder_finished(int8_t *passwd, uint8_t *bssid, void *arg)
 {
 	printf("Get SSID: %02x:%02x:%02x:%02x:%02x:%02x.\nPassword:%s\n",
 			 bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5],
