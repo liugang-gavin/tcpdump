@@ -2,16 +2,18 @@
 #include <time.h>  
 #include <stdlib.h>  
 #include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
 
+#include "decoder.h"
 #include "ieee80211.h"
+pcap_t *device;
 
-int main()  
+void* start_capture(void* argv)  
 {  
   char errBuf[PCAP_ERRBUF_SIZE], * devStr;
   pcap_handler callback;
   int  dlt;
-
-  decoder_init();
 
   /* get a device */
   //devStr = pcap_lookupdev(errBuf);
@@ -25,7 +27,7 @@ int main()
   }
  
   /* open a device, wait until a packet arrives */
-  pcap_t * device = pcap_open_live(devStr, 65535, 1, 0, errBuf);
+  device = pcap_open_live(devStr, 65535, 1, 0, errBuf);
 
   if(!device) {  
     printf("error: pcap_open_live(): %s\n", errBuf);
@@ -49,17 +51,30 @@ int main()
     goto out;
   }
 
-  printf("%x,\n", dlt);
-  /* construct a filter */
-  struct bpf_program filter;
-  pcap_compile(device, &filter, "ether src 00:08:22:ac:c6:fb", 1, 0);
-  pcap_setfilter(device, &filter);
-
   /* wait loop forever */
-  int id = 0;
-  pcap_loop(device, -1, callback, (u_char*)&id);
+  pcap_loop(device, -1, callback, NULL);
 
 out:
   pcap_close(device);
   return 0;
+}
+
+
+int main(int argc, char **argv)
+{   
+	pthread_t tid;
+
+	decoder_open();
+
+	if (!pthread_create(&tid,NULL, start_capture,(void*)NULL)) {
+		printf("pthread create error.\n");
+	}
+	
+	sleep(10);
+	pcap_breakloop(device);
+	printf("pcap_breakloop called!\n");
+	pthread_join(tid, NULL);
+	decoder_close();
+ 
+	return 0;
 }

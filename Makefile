@@ -6,7 +6,7 @@ OBJ = $(CSRC:.c=.o)
 
 CFLAGS = -g -O2
 
-LIBS = -lpcap
+LIBS = -lpcap -lpthread
 
 PROC = mydump
 

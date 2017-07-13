@@ -34,6 +34,7 @@
 #include <string.h>
 
 #include "extract.h"
+#include "decoder.h"
 
 
 /* Lengths of 802.11 header components. */
