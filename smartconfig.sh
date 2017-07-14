@@ -1,7 +1,7 @@
 echo "start get passwd and bssid from APP"
 cp config/monitor.config /etc/config/wireless
 wifi up
-./mytcpdump
+./mydump
 
 if [ $? != 0 ];then
 	echo "ERROR: get passwd and bssid"
