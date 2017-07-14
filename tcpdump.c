@@ -69,7 +69,7 @@ int decoder_finished(int8_t *passwd, uint8_t *bssid, void *arg)
 	fp=fopen("password.txt", "w");
 	fprintf(fp,"%02x:%02x:%02x:%02x:%02x:%02x\n",
 			bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
-	fprintf(fp,"%s", passwd + 1);
+	fprintf(fp,"%s\n", passwd + 1);
 	fclose(fp);
 
 	*(int*)arg = 1;
