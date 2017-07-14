@@ -24,9 +24,9 @@ struct decoder_t{
 	uint32_t prefix_num;
 	uint8_t  src_mac[6];
 	uint8_t  bssid[6];
-   uint8_t  datalen;
+	uint8_t  datalen;
 	uint8_t  curlen;
-   int8_t  *passwd;
+	int8_t  *passwd;
 	decoder_callback_t callback;
 	void	  *callback_arg;
 };
