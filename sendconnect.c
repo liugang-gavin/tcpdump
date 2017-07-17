@@ -31,23 +31,10 @@ int main(int argc, char **argv)
     peer.sin_port = htons(BROAD_PORT);
     peer.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 
-#if 0
-    memset(&client, 0, addrlen);
-    int opt = SO_REUSEADDR;
-    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int));
-    client.sin_family = AF_INET;
-    client.sin_port = htons(BROAD_PORT);
-    client.sin_addr.s_addr=htonl(INADDR_ANY);
-    if((bind(sockfd, (struct sockaddr *)&client, addrlen) ) == -1) {
-        perror("Bind()error");
-        exit(1);
+    while (1) {
+    	sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&peer, addrlen);
+	sleep(1);
     }
-#endif
-    while(1) {
-        sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&peer, addrlen);
-        sleep(1);
-    }
-    fflush(stdout);
     close(sockfd);
 
 }
